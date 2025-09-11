@@ -69,12 +69,13 @@ def main(cfg: Config) -> None:
     if cfg.enable_muon is False:
         optimizer = optim.Adam(q_network.parameters(), lr=cfg.learning_rate, eps=cfg.adam_eps)
     if cfg.enable_muon:
-        from muon import MuonWithAuxAdam
+        from muon import SingleDeviceMuonWithAuxAdam
         paramters = q_network.named_modules()
         muon_name =['conv2', 'conv3','fc1']
         muon_weight = []
         adam_param = []
         for name, param in paramters:
+            if not name:continue
             adam_param.append(param.bias)
             if name in muon_name:
                 muon_weight.append(param.weight)
@@ -86,7 +87,7 @@ def main(cfg: Config) -> None:
             dict(params=adam_param, use_muon=False,
                  lr=cfg.learning_rate, betas=(0.9, 0.999),eps=cfg.adam_eps, weight_decay=0),
         ]
-        optimizer = MuonWithAuxAdam(param_groups)
+        optimizer = SingleDeviceMuonWithAuxAdam(param_groups)
 
 
     target_network = QNetwork(envs).to(device)
@@ -103,6 +104,7 @@ def main(cfg: Config) -> None:
 
     # TRY NOT TO MODIFY: start the game
     obs, _ = envs.reset()
+    # expl_rewards = []
     for global_step in range(cfg.total_timesteps):
         # ALGO LOGIC: put action logic here
         epsilon = linear_schedule(cfg.start_e, cfg.end_e, cfg.exploration_fraction * cfg.total_timesteps, global_step)
@@ -117,15 +119,9 @@ def main(cfg: Config) -> None:
 
         # TRY NOT TO MODIFY: record rewards for plotting purposes
         if "final_info" in infos:
-            expl_rewards = []
             for info in infos["final_info"]:
-                # Skip the envs that are not done
-                if "episode" not in info:
-                    continue
-                expl_rewards.append(info["episode"]["r"])
-
-            xlog.update('expl_reward', np.mean(expl_rewards) if len(expl_rewards) > 0 else 0)
-
+                if "episode" in info:
+                    expl_reward = info["episode"]["r"].mean()
 
         # TRY NOT TO MODIFY: save data to reply buffer; handle `final_observation`
         real_next_obs = next_obs.copy()
@@ -155,7 +151,7 @@ def main(cfg: Config) -> None:
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
-                xlog.update('td_loss', loss)
+                xlog.update('td_loss', loss.item())
                 xlog.update('q_values', old_val.mean().item())
 
             if global_step % cfg.redo_check_interval == 0:
@@ -169,8 +165,8 @@ def main(cfg: Config) -> None:
                     use_lecun_init=cfg.use_lecun_init,
                 )
 
-                xlog.update(f"dormant_tau_{cfg.redo_tau}_fraction", redo_out["dormant_fraction"])
-                xlog.update(f"dormant_tau_{cfg.redo_tau}_count", redo_out["dormant_count"])
+                xlog.update(f"dormant_tau_{cfg.redo_tau}_fraction", redo_out["dormant_fraction"].item())
+                xlog.update(f"dormant_tau_{cfg.redo_tau}_count", redo_out["dormant_count"].item())
 
             # update target network
             if global_step % cfg.target_network_frequency == 0:
@@ -179,16 +175,18 @@ def main(cfg: Config) -> None:
                         cfg.tau * q_network_param.data + (1.0 - cfg.tau) * target_network_param.data
                     )
 
-    if global_step %1000==0:
-        eval_reward = evaluate(
-            envs=eval_envs,
-            eval_episodes=5,
-            model=QNetwork,
-            device=cfg.device,
-        )
-        xlog.update('eval_reward', eval_reward)
-        xlog.log()
-        QNetwork.train()
+            if global_step %1000==0:
+                eval_reward = evaluate(
+                    envs=eval_envs,
+                    eval_episodes=5,
+                    model=q_network,
+                    device=device,
+                )
+                print(f"global_step: {global_step} eval reward: {eval_reward}, expl reward: {expl_reward}")
+                xlog.update('expl_reward', expl_reward)
+                xlog.update('eval_reward', eval_reward)
+                xlog.log()
+                # QNetwork.train()
 
     if cfg.save_model:
         model_path = Path(f"runs/{run_name}/{cfg.exp_name}")

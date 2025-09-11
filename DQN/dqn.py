@@ -20,7 +20,7 @@ from redo import run_redo
 from utils import lecun_normal_initializer, make_env, set_cuda_configuration
 from evaluate import evaluate
 
-from xinglog.xinglog import XLogger
+from xinglog.log import XLogger
 
 from agent import dqn_loss
 

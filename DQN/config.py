@@ -35,7 +35,7 @@ class Config:
     start_e: float = 1.0
     end_e: float = 0.01
     exploration_fraction: float = 0.10
-    learning_starts: int = 80_000  # cleanRL default: 80000, theirs 20000
+    learning_starts: int = 20_000  # cleanRL default: 80000, theirs 20000
     train_frequency: int = 4  # cleanRL default: 4, theirs 1
 
     # ReDo settings

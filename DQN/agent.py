@@ -6,13 +6,13 @@ import torch.nn.functional as F
 class QNetwork(nn.Module):
     """Basic nature DQN agent."""
 
-    def __init__(self, env):
+    def __init__(self, action_space):
         super().__init__()
         self.conv1 = nn.Conv2d(4, 32, 8, stride=4)
         self.conv2 = nn.Conv2d(32, 64, 4, stride=2)
         self.conv3 = nn.Conv2d(64, 64, 3, stride=1)
         self.fc1 = nn.Linear(3136, 512)
-        self.q = nn.Linear(512, int(env.single_action_space.n))
+        self.q = nn.Linear(512, action_space)
 
     def forward(self, x):
         x = F.relu(self.conv1(x / 255.0))

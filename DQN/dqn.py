@@ -21,8 +21,11 @@ from utils import lecun_normal_initializer, make_env, set_cuda_configuration
 from evaluate import evaluate
 
 from xinglog.log import XLogger
+import threading
 
 from agent import dqn_loss
+
+from tqdm import trange
 
 
 def main(cfg: Config) -> None:
@@ -44,9 +47,11 @@ def main(cfg: Config) -> None:
     envs = gym.vector.SyncVectorEnv(
         [make_env(cfg.env_id, cfg.seed + i) for i in range(cfg.num_envs)]
     )
+
     eval_envs = gym.vector.SyncVectorEnv(
-        [make_env(cfg.env_id, cfg.seed+100 + i) for i in range(cfg.num_envs)]
+        [make_env(cfg.env_id, cfg.seed + i+1000) for i in range(cfg.num_envs)]
     )
+
     # envs = make_atari_env(env_id=cfg.env_id,num_envs=1,)
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
@@ -61,8 +66,14 @@ def main(cfg: Config) -> None:
         algo_name = 'DQN'
     rec_variable_name = ['eval_reward','expl_reward','td_loss','q_values',f"dormant_tau_{cfg.redo_tau}_fraction",f"dormant_tau_{cfg.redo_tau}_count"]
     xlog = XLogger(exp_path=exp_path, algo_dir=algo_name, res_filename=res_filename, record_variable_names=rec_variable_name)
+    single_action_space = int(envs.single_action_space.n)
+    q_network = QNetwork(single_action_space).to(device)
 
-    q_network = QNetwork(envs).to(device)
+    target_network = QNetwork(single_action_space).to(device)
+    target_network.load_state_dict(q_network.state_dict())
+
+    eval_q_network = QNetwork(single_action_space).to(device)
+
     if cfg.use_lecun_init:
         # Use the same initialization scheme as jax/flax
         q_network.apply(lecun_normal_initializer)
@@ -90,14 +101,13 @@ def main(cfg: Config) -> None:
         optimizer = SingleDeviceMuonWithAuxAdam(param_groups)
 
 
-    target_network = QNetwork(envs).to(device)
-    target_network.load_state_dict(q_network.state_dict())
 
     rb = ReplayBuffer(
         cfg.buffer_size,
         envs.single_observation_space,
         envs.single_action_space,
         device,
+        n_envs=cfg.num_envs,
         optimize_memory_usage=True,
         handle_timeout_termination=False,
     )
@@ -105,7 +115,9 @@ def main(cfg: Config) -> None:
     # TRY NOT TO MODIFY: start the game
     obs, _ = envs.reset()
     # expl_rewards = []
-    for global_step in range(cfg.total_timesteps):
+    expl_reward=0
+    eval_thread=None
+    for global_step in trange(cfg.total_timesteps):
         # ALGO LOGIC: put action logic here
         epsilon = linear_schedule(cfg.start_e, cfg.end_e, cfg.exploration_fraction * cfg.total_timesteps, global_step)
         if random.random() < epsilon:
@@ -120,8 +132,9 @@ def main(cfg: Config) -> None:
         # TRY NOT TO MODIFY: record rewards for plotting purposes
         if "final_info" in infos:
             for info in infos["final_info"]:
-                if "episode" in info:
+                if info is not None and "episode" in info:
                     expl_reward = info["episode"]["r"].mean()
+        xlog.update('expl_reward', expl_reward)
 
         # TRY NOT TO MODIFY: save data to reply buffer; handle `final_observation`
         real_next_obs = next_obs.copy()
@@ -175,21 +188,28 @@ def main(cfg: Config) -> None:
                         cfg.tau * q_network_param.data + (1.0 - cfg.tau) * target_network_param.data
                     )
 
-            if global_step %1000==0:
-                eval_reward = evaluate(
-                    envs=eval_envs,
-                    eval_episodes=5,
-                    model=q_network,
-                    device=device,
-                )
-                print(f"global_step: {global_step} eval reward: {eval_reward}, expl reward: {expl_reward}")
-                xlog.update('expl_reward', expl_reward)
-                xlog.update('eval_reward', eval_reward)
-                xlog.log()
-                # QNetwork.train()
+            if global_step %50000==0:
+
+                eval_state = q_network.state_dict()
+                # evaluate(
+                #     envs=eval_envs,
+                #     eval_episodes=5,
+                #     state_dict=eval_state,
+                #     device=device,
+                #     xlog=xlog,
+                # )global_step,
+                #              eval_envs,ccc
+                #              eval_episodes,
+                #              eval_policy,
+                #              xlog=None,
+                while eval_thread and eval_thread.is_alive():
+                    time.sleep(1)
+                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, xlog))
+                eval_thread.start()
+                # eval_thread.join()
 
     if cfg.save_model:
-        model_path = Path(f"runs/{run_name}/{cfg.exp_name}")
+        model_path = Path(f"{exp_path}/{data}")
         model_path.mkdir(parents=True, exist_ok=True)
         torch.save(q_network.state_dict(), model_path / ".cleanrl_model")
         print(f"model saved to {model_path}")

@@ -1,0 +1,4 @@
+gymnasium[accept-rom-license]==0.28.1
+ale_py==0.8.1
+opencv-python==4.12.0.88
+tyro==0.9.31

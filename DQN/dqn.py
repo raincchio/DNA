@@ -58,12 +58,11 @@ def main(cfg: Config) -> None:
 
     exp_path = '/vepfs-dev/xing/workspace/DNA/experiments'
     res_filename = f'{cfg.env_id}-seed_{cfg.seed}'
+    algo_name = "DQN"
     if cfg.enable_muon:
-        algo_name = f'DQN_muon'
+        algo_name += "_muon"
     elif cfg.enable_redo:
-        algo_name = f'DQN_redo'
-    else:
-        algo_name = 'DQN'
+        algo_name += "_redo"
     rec_variable_name = ['eval_reward','expl_reward','td_loss','q_values',f"dormant_tau_{cfg.redo_tau}_fraction",f"dormant_tau_{cfg.redo_tau}_count"]
     xlog = XLogger(exp_path=exp_path, algo_dir=algo_name, res_filename=res_filename, record_variable_names=rec_variable_name)
     single_action_space = int(envs.single_action_space.n)
@@ -75,9 +74,9 @@ def main(cfg: Config) -> None:
     if cfg.use_lecun_init:
         # Use the same initialization scheme as jax/flax
         q_network.apply(lecun_normal_initializer)
-    if cfg.enable_muon is False:
+    if not cfg.enable_muon:
         optimizer = optim.Adam(q_network.parameters(), lr=cfg.learning_rate, eps=cfg.adam_eps)
-    if cfg.enable_muon:
+    else:
         from muon import SingleDeviceMuonWithAuxAdam
         paramters = q_network.named_modules()
         muon_name =['conv2', 'conv3','fc1']
@@ -92,7 +91,7 @@ def main(cfg: Config) -> None:
                 adam_param.append(param.weight)
         param_groups = [
             dict(params=muon_weight, use_muon=True,
-                 lr=cfg.lr_muon, weight_decay=0),
+                 lr=cfg.learning_rate, weight_decay=0),
             dict(params=adam_param, use_muon=False,
                  lr=cfg.learning_rate, betas=(0.9, 0.999),eps=cfg.adam_eps, weight_decay=0),
         ]

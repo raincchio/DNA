@@ -21,7 +21,7 @@ class Config:
     env_id: str = "DemonAttack-v4"
     # env_id: str = "DemonAttackNoFrameskip-v4"
     # env_id: str = "breakout"
-    total_timesteps: int = 5_000_000
+    total_timesteps: int = 10_000_000
     num_envs: int = 1
 
     # DQN settings
@@ -29,22 +29,22 @@ class Config:
     batch_size: int = 32
     learning_rate: float = 6.25 * 1e-5  # cleanRL default: 1e-4, theirs: 6.25 * 1e-5
     adam_eps: float = 1.5 * 1e-4
-    use_lecun_init: bool = False  # ReDO uses lecun_normal initializer, cleanRL uses the pytorch default (kaiming_uniform)
+    use_lecun_init: bool = True  # ReDO uses lecun_normal initializer, cleanRL uses the pytorch default (kaiming_uniform)
     gamma: float = 0.99
     tau: float = 1.0
-    target_network_frequency: int = 8000  # cleanRL default: 8000, 4 freq -> 8000, 1 -> 2000
+    target_network_frequency: int = 2000  # cleanRL default: 8000, 4 freq -> 8000, 1 -> 2000
     start_e: float = 1.0
     end_e: float = 0.01
     exploration_fraction: float = 0.10
     learning_starts: int = 20_000  # cleanRL default: 80000, theirs 20000
-    train_frequency: int = 4  # cleanRL default: 4, theirs 1
+    train_frequency: int = 1  # cleanRL default: 4, theirs 1
 
     # ReDo settings
     enable_redo: bool = False
-    redo_tau: float = 0.025  # 0.025 for default, else 0.1
+    redo_tau: float = 0.1  # 0.025 for default, else 0.1
     redo_check_interval: int = 1000
     redo_bs: int = 64
 
     # Muon setting
     enable_muon: bool = False
-    lr_muon:float = 0.001
+    lr_muon: float = 1e-4

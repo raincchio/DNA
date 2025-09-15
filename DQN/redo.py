@@ -209,6 +209,12 @@ def run_redo(
     # Calculate activations
     _ = model(obs)
 
+    # Masks for tau=0 logging
+    zero_masks = _get_redo_masks(activations, 0.0)
+    total_neurons = sum([torch.numel(mask) for mask in zero_masks])
+    # zero_count = sum([torch.sum(mask) for mask in zero_masks])
+    # zero_fraction = (zero_count / total_neurons) * 100
+
     # Calculate the masks actually used for resetting
     masks = _get_redo_masks(activations, tau)
     dormant_count = sum([torch.sum(mask) for mask in masks])

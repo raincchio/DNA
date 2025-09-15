@@ -5,6 +5,7 @@ python 3.10
 
 ```bash
 pip install git+https://github.com/KellerJordan/Muon 
+pip install git+https://github.com/raincchio/xing
 ```
 
 

@@ -72,8 +72,6 @@ def main(cfg: Config) -> None:
     target_network = QNetwork(single_action_space).to(device)
     target_network.load_state_dict(q_network.state_dict())
 
-    eval_q_network = QNetwork(single_action_space).to(device)
-
     if cfg.use_lecun_init:
         # Use the same initialization scheme as jax/flax
         q_network.apply(lecun_normal_initializer)

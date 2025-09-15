@@ -18,9 +18,10 @@ class Config:
     save_model: bool = False
 
     # Environment settings
-    env_id: str = "DemonAttackNoFrameskip-v4"
+    env_id: str = "DemonAttack-v4"
+    # env_id: str = "DemonAttackNoFrameskip-v4"
     # env_id: str = "breakout"
-    total_timesteps: int = 10_000_000
+    total_timesteps: int = 5_000_000
     num_envs: int = 1
 
     # DQN settings

@@ -202,7 +202,7 @@ def main(cfg: Config) -> None:
                 #              xlog=None,
                 while eval_thread and eval_thread.is_alive():
                     time.sleep(1)
-                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, xlog))
+                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, xlog, device))
                 eval_thread.start()
                 # eval_thread.join()
 

@@ -1,5 +1,5 @@
 cd /vepfs-dev/xing/workspace/DNA
-export PYTHONPATH=${pwd}:${pwd}/DQN
+export PYTHONPATH=$(pwd):$(pwd)/DQN
 python=/vepfs-dev/xing/miniconda3/envs/dna/bin/python
 
 #envs='BreakoutNoFrameskip-v4 BeamRiderNoFrameskip-v4 EnduroNoFrameskip-v4'

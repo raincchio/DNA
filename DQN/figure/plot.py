@@ -10,7 +10,7 @@ xplot = XPlotter()
 DOMAINS = ['BreakoutNoFrameskip-v4', 'BeamRiderNoFrameskip-v4', 'EnduroNoFrameskip-v4','SpaceInvadersNoFrameskip-v4', 'QbertNoFrameskip-v4',
            'SeaquestNoFrameskip-v4', 'PongNoFrameskip-v4', ]
 
-DOMAINS = ['DemonAttackNoFrameskip-v4', ]
+DOMAINS = ['DemonAttack-v4', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [

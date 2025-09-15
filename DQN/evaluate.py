@@ -12,11 +12,12 @@ def evaluate(global_step,
              eval_episodes,
              eval_state,
              xlog=None,
+             device='cpu',
              ):
     # model.eval()
     start_time = time.time()
 
-    device = torch.device('cpu')
+    # device = torch.device('cuda')
     old_log = deepcopy(xlog.data_log)
 
     single_action_space = int(eval_envs.single_action_space.n)

@@ -4,7 +4,7 @@ python=/vepfs-dev/xing/miniconda3/envs/dna/bin/python
 
 #envs='BreakoutNoFrameskip-v4 BeamRiderNoFrameskip-v4 EnduroNoFrameskip-v4'
 envs='BreakoutNoFrameskip-v4 BeamRiderNoFrameskip-v4 EnduroNoFrameskip-v4 SpaceInvadersNoFrameskip-v4 QbertNoFrameskip-v4 SeaquestNoFrameskip-v4 PongNoFrameskip-v4'
-envs='DemonAttackNoFrameskip-v4'
+envs='DemonAttack-v4'
 declare -i i=0
 
 misc=''

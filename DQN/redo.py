@@ -222,8 +222,8 @@ def run_redo(
 
     # Re-initialize the dormant neurons and reset the Adam moments
     if re_initialize:
-        print("Re-initializing dormant neurons")
-        print(f"Total neurons: {total_neurons} | Dormant neurons: {dormant_count} | Dormant fraction: {dormant_fraction:.2f}%")
+        # print("Re-initializing dormant neurons")
+        # print(f"Total neurons: {total_neurons} | Dormant neurons: {dormant_count} | Dormant fraction: {dormant_fraction:.2f}%")
         _reset_dormant_neurons(model, masks, use_lecun_init)
         _reset_adam_moments(optimizer, masks)
 

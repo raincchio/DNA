@@ -92,7 +92,7 @@ def main(cfg: Config) -> None:
                 adam_param.append(param.weight)
         param_groups = [
             dict(params=muon_weight, use_muon=True,
-                 lr=0.02, weight_decay=0),
+                 lr=cfg.lr_muon, weight_decay=0),
             dict(params=adam_param, use_muon=False,
                  lr=cfg.learning_rate, betas=(0.9, 0.999),eps=cfg.adam_eps, weight_decay=0),
         ]

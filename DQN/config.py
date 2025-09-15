@@ -47,3 +47,4 @@ class Config:
 
     # Muon setting
     enable_muon: bool = False
+    lr_muon:float = 0.001

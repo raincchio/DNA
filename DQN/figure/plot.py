@@ -37,7 +37,7 @@ for idd, domain in enumerate(DOMAINS):
     for algo in algos:
         algo_path = os.path.join(path, algo)  # can  get multiple metrics result
         res_ = xplot.get_result(algo_path, domain=domain, metric=metric)
-        res = xplot.smooth_result(res_)
+        res = xplot.smooth_result(res_,10)
         if len(res)==0:
             # print(idd, domain, algo, 'zero data')
             continue

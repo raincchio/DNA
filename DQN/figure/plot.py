@@ -61,7 +61,7 @@ for idd, domain in enumerate(DOMAINS):
 
     # Plot misc
     plt.ylabel('episode Reward')
-    plt.xlabel('steps(K)/1e7')
+    plt.xlabel('steps(50K)/1e7')
 
     # x_tick_interval = max_len//5  # just want five ticks, let it be max_len//5
     # plt.xticks([0,200,400,600,800,1000], ['0', '0.2', '0.4', '0.6', '0.8','1'])
@@ -80,4 +80,5 @@ for idd, domain in enumerate(DOMAINS):
 
     # plt.show()
     plt.savefig('{}-{}-res.png'.format(idd,domain), bbox_inches='tight',  dpi=300)
+    print('{}-{}-res.png'.format(idd,domain))
     plt.clf()

@@ -171,7 +171,7 @@ def main(cfg: Config) -> None:
                     model=q_network,
                     optimizer=optimizer,
                     tau=cfg.redo_tau,
-                    re_initialize=cfg.enable_redo,
+                    re_initialize=cfg.enable_redo and global_step<=cfg.stop_step,
                     use_lecun_init=cfg.use_lecun_init,
                 )
 

@@ -48,3 +48,4 @@ class Config:
     # Muon setting
     enable_muon: bool = False
     lr_muon: float = 1e-4
+    stop_step: int = 5_000_000

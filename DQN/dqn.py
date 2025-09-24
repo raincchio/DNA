@@ -30,16 +30,16 @@ from tqdm import trange
 
 def main(cfg: Config) -> None:
 
-    # To get deterministic pytorch to work
-    if cfg.torch_deterministic:
-        os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-        torch.use_deterministic_algorithms(True)
-
-    # TRY NOT TO MODIFY: seeding
+    torch.set_num_threads(1)
     random.seed(cfg.seed)
     np.random.seed(cfg.seed)
+
+    # torch
     torch.manual_seed(cfg.seed)
-    torch.set_float32_matmul_precision("high")
+    torch.cuda.manual_seed(cfg.seed)
+    torch.cuda.manual_seed_all(cfg.seed)
+    torch.backends.cudnn.deterministic = True  # 强制 CuDNN 使用确定性算法
+    torch.backends.cudnn.benchmark = False
 
     device = set_cuda_configuration(cfg.gpu)
 
@@ -52,7 +52,7 @@ def main(cfg: Config) -> None:
         [make_env(cfg.env_id, cfg.seed + i+1000) for i in range(cfg.num_envs)]
     )
 
-    # envs = make_atari_env(env_id=cfg.env_id,num_envs=1,)
+
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
 
@@ -67,6 +67,7 @@ def main(cfg: Config) -> None:
     xlog = XLogger(exp_path=exp_path, algo_dir=algo_name, res_filename=res_filename, record_variable_names=rec_variable_name)
     single_action_space = int(envs.single_action_space.n)
     q_network = QNetwork(single_action_space).to(device)
+    eval_q_network = QNetwork(single_action_space).to(device)
 
     target_network = QNetwork(single_action_space).to(device)
     target_network.load_state_dict(q_network.state_dict())
@@ -171,7 +172,7 @@ def main(cfg: Config) -> None:
                     model=q_network,
                     optimizer=optimizer,
                     tau=cfg.redo_tau,
-                    re_initialize=cfg.enable_redo and global_step<=cfg.stop_step,
+                    re_initialize=cfg.enable_redo,
                     use_lecun_init=cfg.use_lecun_init,
                 )
 
@@ -185,7 +186,7 @@ def main(cfg: Config) -> None:
                         cfg.tau * q_network_param.data + (1.0 - cfg.tau) * target_network_param.data
                     )
 
-            if global_step %50000==0:
+            if global_step %25000==0:
 
                 eval_state = q_network.state_dict()
                 # evaluate(
@@ -194,14 +195,10 @@ def main(cfg: Config) -> None:
                 #     state_dict=eval_state,
                 #     device=device,
                 #     xlog=xlog,
-                # )global_step,
-                #              eval_envs,ccc
-                #              eval_episodes,
-                #              eval_policy,
-                #              xlog=None,
+                # )
                 while eval_thread and eval_thread.is_alive():
                     time.sleep(1)
-                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, xlog, device))
+                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, eval_q_network, xlog, device))
                 eval_thread.start()
                 # eval_thread.join()
 

@@ -1,34 +1,29 @@
-from DQN.agent import QNetwork
 import torch
 import numpy as np
-import gymnasium as gym
 from copy import deepcopy
 import time
-from utils import make_env
-from config import Config
 
 def evaluate(global_step,
              eval_envs,
              eval_episodes,
              eval_state,
+             eval_q_network,
              xlog=None,
-             device='cpu',
+             device='cuda',
              ):
-    # model.eval()
+
     start_time = time.time()
 
     # device = torch.device('cuda')
     old_log = deepcopy(xlog.data_log)
 
-    single_action_space = int(eval_envs.single_action_space.n)
-    q_network = QNetwork(single_action_space).to(device)
-    q_network.load_state_dict(eval_state)
+    eval_q_network.load_state_dict(eval_state)
 
     obs,_ = eval_envs.reset()
     episodic_returns = []
     while len(episodic_returns) < eval_episodes:
 
-        q_values = q_network(torch.Tensor(obs).to(device))
+        q_values = eval_q_network(torch.Tensor(obs).to(device))
         actions = torch.argmax(q_values, dim=1).cpu().numpy()
         next_obs,_ ,_, _, infos = eval_envs.step(actions)
 

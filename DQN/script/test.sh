@@ -7,49 +7,28 @@ envs='BreakoutNoFrameskip-v4 BeamRiderNoFrameskip-v4 EnduroNoFrameskip-v4 SpaceI
 envs='DemonAttackNoFrameskip-v0'
 declare -i i=0
 
-misc=''
-
-for seed in $(seq 1 6)
+for seed in $(seq 1 3)
 do
-    for env in ${envs}
+#  echo ${seed}
+  for env in ${envs}
+  do
+#    echo ${env}
+    for wd in 1
     do
+#      echo ${wd}
+      for itv in 500 1000 2000
+      do
         #export CUDA_VISIBLE_DEVICES=
         export CUDA_VISIBLE_DEVICES=$(($i%8))
         i+=1
-        cmd="nohup ${python} -um dqn --seed=${seed} --env_id=${env} ${misc}  >>/dev/null 2>&1 &"
+#        misc="--enable_adams --enable_redo --adams_weight_decay ${wd} --redo_check_interval ${itv}"
+#        cmd="nohup ${python} -um dqn --seed=${seed} --env_id=${env} ${misc} --exp_name  adams_wd_${wd}_redo_itv_${itv}  >>/dev/null 2>&1 &"
+
+        misc="--enable_adam --enable_redo --redo_check_interval ${itv}"
+        cmd="nohup ${python} -um dqn --seed=${seed} --env_id=${env} ${misc} --exp_name  adam_redo_itv_${itv}  >>/dev/null 2>&1 &"
         echo $cmd
         eval $cmd
+      done
     done
-done
-
-misc='--enable_redo'
-
-for seed in $(seq 1 6)
-do
-    for env in ${envs}
-    do
-        #export CUDA_VISIBLE_DEVICES=
-        export CUDA_VISIBLE_DEVICES=$(($i%8))
-        i+=1
-        cmd="nohup ${python} -um dqn --seed=${seed} --env_id=${env} ${misc}  >>/dev/null 2>&1 &"
-        echo $cmd
-        eval $cmd
-
-    done
-done
-
-misc='--enable_muon'
-
-for seed in $(seq 1 6)
-do
-    for env in ${envs}
-    do
-        #export CUDA_VISIBLE_DEVICES=
-        export CUDA_VISIBLE_DEVICES=$(($i%8))
-        i+=1
-        cmd="nohup ${python} -um dqn --seed=${seed} --env_id=${env} ${misc}  >>/dev/null 2>&1 &"
-        echo $cmd
-        eval $cmd
-
-    done
+  done
 done

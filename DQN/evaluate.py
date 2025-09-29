@@ -42,5 +42,5 @@ def evaluate(global_step,
     # 计算程序运行时间
     elapsed_time = end_time - start_time
 
-    print(f"glb_stp: {global_step} , expl_rwd: {old_log['expl_reward']}, eval_rwd: {old_log['eval_reward']}, drmt_pct: {int(data[4])} % elapsed_time: {elapsed_time:.2f} s")
+    print(f"glb_stp: {global_step}, expl_rwd: {old_log['expl_reward']}, eval_rwd: {old_log['eval_reward']}, drmt_pct: {int(data[4])} % elapsed_time: {elapsed_time:.2f} s")
 

@@ -21,7 +21,7 @@ class Config:
     # env_id: str = "DemonAttack-v4"
     env_id: str = "DemonAttackNoFrameskip-v0"
     # env_id: str = "breakout"
-    total_timesteps: int = 10_000_000
+    total_timesteps: int = 1_000_000
     num_envs: int = 1
 
     # DQN settings
@@ -39,6 +39,14 @@ class Config:
     learning_starts: int = 20_000  # cleanRL default: 80000, theirs 20000
     train_frequency: int = 1  # cleanRL default: 4, theirs 1
 
+    # optimizer setting
+    enable_muon: bool = False
+    enable_adams: bool = False
+    enable_adam:bool = False
+
+    # adams setting
+    adams_weight_decay: float = 0.1
+
     # ReDo settings
     enable_redo: bool = False
     redo_tau: float = 0.1  # 0.025 for default, else 0.1
@@ -46,6 +54,8 @@ class Config:
     redo_bs: int = 64
 
     # Muon setting
-    enable_muon: bool = False
     lr_muon: float = 1e-4
     stop_step: int = 5_000_000
+
+    # Evaluation
+    evaluateion_freq: int = 25_000

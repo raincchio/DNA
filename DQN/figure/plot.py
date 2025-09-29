@@ -14,9 +14,17 @@ DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
-    "DQN",
-    'DQN_muon',
     'DQN_redo',
+    'DQN',
+    "adams_wd_0.1_redo_itv_500",
+    'adams_wd_0.1_redo_itv_1000',
+    'adams_wd_0.1_redo_itv_2000',
+    "adams_wd_0.5_redo_itv_500",
+    'adams_wd_0.5_redo_itv_1000',
+    'adams_wd_0.5_redo_itv_2000',
+    "adams_wd_1_redo_itv_500",
+    'adams_wd_1_redo_itv_1000',
+    'adams_wd_1_redo_itv_2000',
 ]
 metric = "eval_reward"
 
@@ -49,7 +57,7 @@ for idd, domain in enumerate(DOMAINS):
         #     print(f'{algo}: {mean[200]}±{std[200]} {mean[400]}±{std[400]}')
         x_vals = np.arange(len(mean))  # x axis item interval
 
-        color = COLORS[algos.index(algo)]
+        color = COLORS[algos.index(algo)%8]
         marker = MARKERS[algos.index(algo) % 6]
         marker_num = 8
         makerevery = x_vals[-1] // marker_num

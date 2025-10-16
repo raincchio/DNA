@@ -14,17 +14,18 @@ DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
-    'DQN_redo',
     'DQN',
-    "adams_wd_0.1_redo_itv_500",
-    'adams_wd_0.1_redo_itv_1000',
-    'adams_wd_0.1_redo_itv_2000',
-    "adams_wd_0.5_redo_itv_500",
-    'adams_wd_0.5_redo_itv_1000',
-    'adams_wd_0.5_redo_itv_2000',
-    "adams_wd_1_redo_itv_500",
-    'adams_wd_1_redo_itv_1000',
-    'adams_wd_1_redo_itv_2000',
+    'muon_test',
+    'DQN_redo',
+    # "adams_wd_0.1_redo_itv_500",
+    # 'adams_wd_0.1_redo_itv_1000',
+    # 'adams_wd_0.1_redo_itv_2000',
+    # "adams_wd_0.5_redo_itv_500",
+    # 'adams_wd_0.5_redo_itv_1000',
+    # 'adams_wd_0.5_redo_itv_2000',
+    # "adams_wd_1_redo_itv_500",
+    # 'adams_wd_1_redo_itv_1000',
+    # 'adams_wd_1_redo_itv_2000',
 ]
 metric = "eval_reward"
 
@@ -69,7 +70,7 @@ for idd, domain in enumerate(DOMAINS):
 
     # Plot misc
     plt.ylabel('episode Reward')
-    plt.xlabel('steps(50K)/1e7')
+    plt.xlabel('steps(25K)/1e7')
 
     # x_tick_interval = max_len//5  # just want five ticks, let it be max_len//5
     # plt.xticks([0,200,400,600,800,1000], ['0', '0.2', '0.4', '0.6', '0.8','1'])

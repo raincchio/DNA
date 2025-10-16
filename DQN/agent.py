@@ -8,11 +8,11 @@ class QNetwork(nn.Module):
 
     def __init__(self, action_space):
         super().__init__()
-        self.conv1 = nn.Conv2d(4, 32, 8, stride=4)
-        self.conv2 = nn.Conv2d(32, 64, 4, stride=2)
-        self.conv3 = nn.Conv2d(64, 64, 3, stride=1)
-        self.fc1 = nn.Linear(3136, 512)
-        self.q = nn.Linear(512, action_space)
+        self.conv1 = nn.Conv2d(4, 32, 8, stride=4, bias=False)
+        self.conv2 = nn.Conv2d(32, 64, 4, stride=2, bias=False)
+        self.conv3 = nn.Conv2d(64, 64, 3, stride=1, bias=False)
+        self.fc1 = nn.Linear(3136, 512, bias=False)
+        self.q = nn.Linear(512, action_space, bias=False)
 
     def forward(self, x):
         x = F.relu(self.conv1(x / 255.0))

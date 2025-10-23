@@ -179,16 +179,45 @@ def _reset_adam_moments(optimizer: optim.Adam, reset_masks: dict[str, torch.Tens
 
     return optimizer
 
+@torch.no_grad()
+def _reset_adam_moments_wo_bias(optimizer: optim.Adam, reset_masks: dict[str, torch.Tensor]):
+    """Resets the moments of the Adam optimizer for the dormant neurons."""
+
+    # assert isinstance(optimizer, optim.Adam), "Moment resetting currently only supported for Adam optimizer"
+    for i, mask in enumerate(reset_masks):
+        # Reset the moments for the weights
+        optimizer.state_dict()["state"][i]["exp_avg"][mask, ...] = 0.0
+        optimizer.state_dict()["state"][i]["exp_avg_sq"][mask, ...] = 0.0
+        # NOTE: Step count resets are key to the algorithm's performance
+        # It's possible to just reset the step for moment that's being reset
+        optimizer.state_dict()["state"][i]["step"].zero_()
+
+
+        # Reset the moments for the output weights
+        if (
+            len(optimizer.state_dict()["state"][i]["exp_avg"].shape) == 4
+            and len(optimizer.state_dict()["state"][i+ 1]["exp_avg"].shape) == 2
+        ):
+            # Catch transition from conv to linear layer through moment shapes
+            num_repeatition = optimizer.state_dict()["state"][i+1]["exp_avg"].shape[1] // mask.shape[0]
+            linear_mask = torch.repeat_interleave(mask, num_repeatition)
+            optimizer.state_dict()["state"][i+1]["exp_avg"][:, linear_mask] = 0.0
+            optimizer.state_dict()["state"][i+1]["exp_avg_sq"][:, linear_mask] = 0.0
+            optimizer.state_dict()["state"][i+1]["step"].zero_()
+        else:
+            # Standard case: layer and next_layer are both conv or both linear
+            # Reset the outgoing weights to 0
+            optimizer.state_dict()["state"][i +1]["exp_avg"][:, mask, ...] = 0.0
+            optimizer.state_dict()["state"][i +1]["exp_avg_sq"][:, mask, ...] = 0.0
+            optimizer.state_dict()["state"][i +1]["step"].zero_()
 
 @torch.inference_mode()
 def run_redo(
     obs: torch.Tensor,
     model: QNetwork,
     optimizer: optim.Adam,
-    tau: float,
-    re_initialize: bool,
-    use_lecun_init: bool,
-) -> tuple[nn.Module, optim.Adam, float, int]:
+        cfg,
+):
     """
     Checks the number of dormant neurons for a given model.
     If re_initialize is True, then the dormant neurons are re-initialized according to the scheme in
@@ -196,6 +225,9 @@ def run_redo(
 
     Returns the number of dormant neurons.
     """
+    tau = cfg.redo_tau
+    re_initialize = cfg.enable_redo
+    use_lecun_init = cfg.use_lecun_init
 
     activations = {}
     activation_getter = partial(_get_activation, activations=activations)
@@ -225,7 +257,11 @@ def run_redo(
         # print("Re-initializing dormant neurons")
         # print(f"Total neurons: {total_neurons} | Dormant neurons: {dormant_count} | Dormant fraction: {dormant_fraction:.2f}%")
         _reset_dormant_neurons(model, masks, use_lecun_init)
-        _reset_adam_moments(optimizer, masks)
+        # _reset_adam_moments(optimizer, masks)
+        if cfg.wob:
+            _reset_adam_moments_wo_bias(optimizer, masks)
+        else:
+            _reset_adam_moments(optimizer, masks)
 
     # Remove the hooks again
     for handle in handles:

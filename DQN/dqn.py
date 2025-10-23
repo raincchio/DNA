@@ -63,10 +63,10 @@ def main(cfg: Config) -> None:
     rec_variable_name = ['eval_reward','expl_reward','td_loss','q_values',f"dormant_tau_{cfg.redo_tau}_fraction",f"dormant_tau_{cfg.redo_tau}_count"]
     xlog = XLogger(exp_path=exp_path, algo_dir=cfg.exp_name, res_filename=res_filename, record_variable_names=rec_variable_name)
     single_action_space = int(envs.single_action_space.n)
-    q_network = QNetwork(single_action_space).to(device)
-    eval_q_network = QNetwork(single_action_space).to(device)
+    q_network = QNetwork(single_action_space, bias=not cfg.wob).to(device)
+    eval_q_network = QNetwork(single_action_space, bias=not cfg.wob).to(device)
 
-    target_network = QNetwork(single_action_space).to(device)
+    target_network = QNetwork(single_action_space, bias=not cfg.wob).to(device)
     target_network.load_state_dict(q_network.state_dict())
 
     if cfg.use_lecun_init:
@@ -148,9 +148,7 @@ def main(cfg: Config) -> None:
                     redo_samples.observations,
                     model=q_network,
                     optimizer=optimizer,
-                    tau=cfg.redo_tau,
-                    re_initialize=cfg.enable_redo,
-                    use_lecun_init=cfg.use_lecun_init,
+                    cfg=cfg,
                 )
 
                 xlog.update(f"dormant_tau_{cfg.redo_tau}_fraction", redo_out["dormant_fraction"].item())

@@ -7,18 +7,17 @@ import numpy as np
 from xingplot.plot import XPlotter
 
 xplot = XPlotter()
-DOMAINS = ['BreakoutNoFrameskip-v4', 'BeamRiderNoFrameskip-v4', 'EnduroNoFrameskip-v4','SpaceInvadersNoFrameskip-v4', 'QbertNoFrameskip-v4',
-           'SeaquestNoFrameskip-v4', 'PongNoFrameskip-v4', ]
+DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0', 'SeaquestNoFrameskip-v4']
 
-DOMAINS = ['DemonAttackNoFrameskip-v0', ]
+# DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
-    'DQN',
-    'muon_test',
-    'DQN_redo',
-    # "adams_wd_0.1_redo_itv_500",
-    # 'adams_wd_0.1_redo_itv_1000',
+    # 'DQN',
+    # 'muon_test_no_bias',
+    'DQN_redo_wob',
+    "DQN_redo",
+    # 'redo_test',
     # 'adams_wd_0.1_redo_itv_2000',
     # "adams_wd_0.5_redo_itv_500",
     # 'adams_wd_0.5_redo_itv_1000',
@@ -70,7 +69,7 @@ for idd, domain in enumerate(DOMAINS):
 
     # Plot misc
     plt.ylabel('episode Reward')
-    plt.xlabel('steps(25K)/1e7')
+    plt.xlabel('steps(50K)/1e7')
 
     # x_tick_interval = max_len//5  # just want five ticks, let it be max_len//5
     # plt.xticks([0,200,400,600,800,1000], ['0', '0.2', '0.4', '0.6', '0.8','1'])
@@ -88,6 +87,6 @@ for idd, domain in enumerate(DOMAINS):
     plt.title('('+chr(65+idd)+') '+domain)
 
     # plt.show()
-    plt.savefig('{}-{}-res.png'.format(idd,domain), bbox_inches='tight',  dpi=300)
+    plt.savefig('res/{}-{}.png'.format(idd,domain), bbox_inches='tight',  dpi=300)
     print('{}-{}-res.png'.format(idd,domain))
     plt.clf()

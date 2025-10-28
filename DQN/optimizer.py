@@ -33,5 +33,5 @@ def get_optimizer(cfg, q_network):
     if cfg.enable_adams:
         optimizer = Adams_ZeRO(q_network.parameters(), lr=cfg.learning_rate,  weight_decay=cfg.adams_weight_decay, scalar_vector_weight_decay=0.1, betas=(0.9, 0.999))
     if cfg.enable_adam:
-        optimizer = optim.Adam(q_network.parameters(), lr=cfg.learning_rate)
+        optimizer = optim.Adam(q_network.parameters(), lr=cfg.learning_rate,eps=cfg.adam_eps)
     return optimizer

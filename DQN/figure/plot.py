@@ -7,24 +7,17 @@ import numpy as np
 from xingplot.plot import XPlotter
 
 xplot = XPlotter()
-DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0', 'SeaquestNoFrameskip-v4']
+DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0', 'SeaquestNoFrameskip-v4', 'DemonAttackNoFrameskip-v0',]
 
-# DOMAINS = ['DemonAttackNoFrameskip-v0', ]
+DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
-    # 'DQN',
-    # 'muon_test_no_bias',
-    'DQN_redo_wob',
-    "DQN_redo",
-    # 'redo_test',
-    # 'adams_wd_0.1_redo_itv_2000',
-    # "adams_wd_0.5_redo_itv_500",
-    # 'adams_wd_0.5_redo_itv_1000',
-    # 'adams_wd_0.5_redo_itv_2000',
-    # "adams_wd_1_redo_itv_500",
-    # 'adams_wd_1_redo_itv_1000',
-    # 'adams_wd_1_redo_itv_2000',
+    # 'DQN_muon',
+    'DQN_redo',
+    "DQN_redo_wob",
+    'test_eps_dqn_redo',
+# 'redo_test',
 ]
 metric = "eval_reward"
 

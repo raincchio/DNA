@@ -1,6 +1,6 @@
 import torch.optim as optim
 from adams import Adams_ZeRO
-
+from sam import SAM
 # from xAdam import xAdam
 
 def get_optimizer(cfg, q_network):
@@ -34,4 +34,12 @@ def get_optimizer(cfg, q_network):
         optimizer = Adams_ZeRO(q_network.parameters(), lr=cfg.learning_rate,  weight_decay=cfg.adams_weight_decay, scalar_vector_weight_decay=0.1, betas=(0.9, 0.999))
     if cfg.enable_adam:
         optimizer = optim.Adam(q_network.parameters(), lr=cfg.learning_rate,eps=cfg.adam_eps)
+        if cfg.enable_sam:
+            optimizer = SAM(
+                q_network.parameters(),
+                optimizer,
+                rho=cfg.rho,
+                lr=cfg.learning_rate,
+                eps=cfg.adam_eps
+            )
     return optimizer

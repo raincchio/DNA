@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import optim
 
+# from agent import QNetwork2 as QNetwork
 from agent import QNetwork
 from buffer import ReplayBufferSamples
 

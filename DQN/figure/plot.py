@@ -1,5 +1,6 @@
 #!/home/chenxing/miniconda3/envs/Plot/bin/python3
 import os
+import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,9 +15,14 @@ DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
     # 'DQN_muon',
-    'DQN_redo',
-    "DQN_redo_wob",
-    'test_eps_dqn_redo',
+# 'test_eps_1.5e-4_dqn_redo',
+#     'test_eps_1e-4_dqn_redo',
+
+    "test_eps_1e-8_dqn_redo",
+    "test_eps_1e-9_dqn_red0",
+"test_eps_1e-9_tau_0.2_dqn_redo",
+"test_eps_1e-9_tau_0.05_dqn_redo",
+
 # 'redo_test',
 ]
 metric = "eval_reward"
@@ -62,10 +68,10 @@ for idd, domain in enumerate(DOMAINS):
 
     # Plot misc
     plt.ylabel('episode Reward')
-    plt.xlabel('steps(50K)/1e7')
+    plt.xlabel('steps(1e6)')
 
     # x_tick_interval = max_len//5  # just want five ticks, let it be max_len//5
-    # plt.xticks([0,200,400,600,800,1000], ['0', '0.2', '0.4', '0.6', '0.8','1'])
+    plt.xticks([0,40,80,120,160,200], ['0', '2', '4', '6', '8','10'])
     # plt.xlim(0, x_ticks[-1]+1)
     # plt.ylim(np.floor(min_y_value), np.ceil(max_y_value))
     plt.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
@@ -80,6 +86,7 @@ for idd, domain in enumerate(DOMAINS):
     plt.title('('+chr(65+idd)+') '+domain)
 
     # plt.show()
-    plt.savefig('res/{}-{}.png'.format(idd,domain), bbox_inches='tight',  dpi=300)
+    time_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    plt.savefig(f'res/{idd}-{domain}-res-{time_str}.png', bbox_inches='tight',  dpi=300)
     print('{}-{}-res.png'.format(idd,domain))
     plt.clf()

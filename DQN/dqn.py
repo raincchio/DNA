@@ -10,10 +10,10 @@ import gymnasium as gym
 import numpy as np
 import torch
 
-import torch.optim as optim
 import tyro
 
-from DQN.agent import QNetwork, linear_schedule
+from DQN.agent import linear_schedule
+from DQN.agent import QNetwork
 from buffer import ReplayBuffer
 from config import Config
 from redo import run_redo
@@ -125,20 +125,37 @@ def main(cfg: Config) -> None:
         if global_step > cfg.learning_starts:
             if global_step % cfg.train_frequency == 0:
                 data = rb.sample(cfg.batch_size)
-                loss, old_val = dqn_loss(
-                    q_network=q_network,
-                    target_network=target_network,
-                    obs=data.observations,
-                    next_obs=data.next_observations,
-                    actions=data.actions,
-                    rewards=data.rewards,
-                    dones=data.dones,
-                    gamma=cfg.gamma,
-                )
+
                 # optimize the model
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+                if cfg.enable_sam:
+                    def closure():
+                        loss, old_val = dqn_loss(
+                            q_network=q_network,
+                            target_network=target_network,
+                            obs=data.observations,
+                            next_obs=data.next_observations,
+                            actions=data.actions,
+                            rewards=data.rewards,
+                            dones=data.dones,
+                            gamma=cfg.gamma,
+                        )
+                        return loss
+                    optimizer.step(closure)
+
+                else:
+                    loss, old_val = dqn_loss(
+                        q_network=q_network,
+                        target_network=target_network,
+                        obs=data.observations,
+                        next_obs=data.next_observations,
+                        actions=data.actions,
+                        rewards=data.rewards,
+                        dones=data.dones,
+                        gamma=cfg.gamma,
+                    )
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
                 xlog.update('td_loss', loss.item())
                 xlog.update('q_values', old_val.mean().item())
 

@@ -29,17 +29,36 @@ class QNetwork2(nn.Module):
     def __init__(self, action_space, bias=True):
         super().__init__()
         self.conv1 = nn.Conv2d(4, 32, 8, stride=4)
+        self.layn1 = nn.LayerNorm(32)
         self.conv2 = nn.Conv2d(32, 64, 4, stride=2)
+        self.layn2 = nn.LayerNorm(64)
         self.conv3 = nn.Conv2d(64, 64, 3, stride=1)
+        self.layn3 = nn.LayerNorm(64)
         self.fc1 = nn.Linear(3136, 512)
+        self.layn4 = nn.LayerNorm(512)
         self.q = nn.Linear(512, action_space)
 
     def forward(self, x):
-        x = F.relu(self.conv1(x / 255.0))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
+        x = self.conv1(x / 255.0)
+        x = x.flatten(2).transpose(1, 2)
+        x = self.layn1(x)
+        x= x.transpose(1, 2).reshape(-1, 32, 20, 20)
+        x = F.relu(x)
+
+        x = self.conv2(x)
+        x = x.flatten(2).transpose(1, 2)
+        x = self.layn2(x)
+        x= x.transpose(1, 2).reshape(-1, 64, 9, 9)
+        x = F.relu(x)
+
+        x = self.conv3(x)
+        x = x.flatten(2).transpose(1, 2)
+        x = self.layn3(x)
+        x= x.transpose(1, 2).reshape(-1, 64, 7, 7)
+        x = F.relu(x)
+
         x = torch.flatten(x, start_dim=1)
-        x = F.relu(self.fc1(x))
+        x = F.relu(self.layn4(self.fc1(x)))
         x = self.q(x)
         return x
 

@@ -6,7 +6,7 @@ class Config:
     """Configuration for a ReDo DQN agent."""
 
     # Experiment settings
-    exp_name: str = "ReDo DQN"
+    exp_name: str = "tmp"
     tags: tuple[str, ...] | str | None = None
     seed: int = 0
     torch_deterministic: bool = True
@@ -41,6 +41,7 @@ class Config:
     wob:bool = False
 
     # optimizer setting
+    enable_sam:bool = False
     enable_muon: bool = False
     enable_adams: bool = False
     enable_adam:bool = False
@@ -60,3 +61,7 @@ class Config:
 
     # Evaluation
     evaluateion_freq: int = 50_000
+
+    # sam
+    rho: float = 0.05
+

@@ -56,7 +56,7 @@ def main(cfg: Config) -> None:
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
 
-    exp_path = '/vepfs-dev/xing/workspace/DNA/experiments'
+    exp_path = '/home/sapient/workspace/DNA/experiments'
     res_filename = f'{cfg.env_id}-seed_{cfg.seed}'
 
 
@@ -128,19 +128,31 @@ def main(cfg: Config) -> None:
 
                 # optimize the model
                 if cfg.enable_sam:
-                    def closure():
-                        loss, old_val = dqn_loss(
-                            q_network=q_network,
-                            target_network=target_network,
-                            obs=data.observations,
-                            next_obs=data.next_observations,
-                            actions=data.actions,
-                            rewards=data.rewards,
-                            dones=data.dones,
-                            gamma=cfg.gamma,
-                        )
-                        return loss
-                    optimizer.step(closure)
+                    loss, old_val = dqn_loss(
+                        q_network=q_network,
+                        target_network=target_network,
+                        obs=data.observations,
+                        next_obs=data.next_observations,
+                        actions=data.actions,
+                        rewards=data.rewards,
+                        dones=data.dones,
+                        gamma=cfg.gamma,
+                    )
+                    loss.backward()
+                    optimizer.first_step(zero_grad=True)
+
+                    loss, old_val = dqn_loss(
+                        q_network=q_network,
+                        target_network=target_network,
+                        obs=data.observations,
+                        next_obs=data.next_observations,
+                        actions=data.actions,
+                        rewards=data.rewards,
+                        dones=data.dones,
+                        gamma=cfg.gamma,
+                    )
+                    loss.backward()
+                    optimizer.second_step(zero_grad=True)
 
                 else:
                     loss, old_val = dqn_loss(

@@ -4,9 +4,9 @@ python=/vepfs-dev/xing/miniconda3/envs/dna/bin/python
 
 #envs='BreakoutNoFrameskip-v4 BeamRiderNoFrameskip-v4 EnduroNoFrameskip-v4'
 #envs='BreakoutNoFrameskip-v4 BeamRiderNoFrameskip-v4 EnduroNoFrameskip-v4 SpaceInvadersNoFrameskip-v4 QbertNoFrameskip-v4 SeaquestNoFrameskip-v4 PongNoFrameskip-v4'
-#envs='SpaceInvadersNoFrameskip-v0'
-envs='BeamRiderNoFrameskip-v0 SpaceInvadersNoFrameskip-v0 AsterixNoFrameskip-v0 SeaquestNoFrameskip-v0 BreakoutNoFrameskip-v0 DemonAttackNoFrameskip-v0'
-declare -i i=0
+envs='AsterixNoFrameskip-v0'
+#envs='BeamRiderNoFrameskip-v0 SpaceInvadersNoFrameskip-v0 AsterixNoFrameskip-v0 SeaquestNoFrameskip-v0 BreakoutNoFrameskip-v0 DemonAttackNoFrameskip-v0'
+declare -i i=30
 available_gpus=(0 1 2 3 4 5 6 7)
 
 for seed in $(seq 1 6)

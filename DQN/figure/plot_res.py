@@ -8,15 +8,16 @@ import numpy as np
 from xingplot.plot import XPlotter
 
 xplot = XPlotter()
-DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0', 'SeaquestNoFrameskip-v0', 'BreakoutNoFrameskip-v4',]
+DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0',
+           'SeaquestNoFrameskip-v0', 'BreakoutNoFrameskip-v0','DemonAttackNoFrameskip-v0', ]
 
 # DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
-    'DQN_0106',
-    'DQN_redo_0106',
-    "DQN_neuron_editing_0106",
+    'DQN_0107',
+    'DQN_redo_0107',
+    "DQN_ne_0107",
 ]
 metric = "eval_reward"
 
@@ -33,7 +34,7 @@ for idd, domain in enumerate(DOMAINS):
     for algo in algos:
         algo_path = os.path.join(path, algo)  # can  get multiple metrics result
         res_ = xplot.get_result(algo_path, domain=domain, metric=metric)
-        res = xplot.smooth_result(res_,10)
+        res = xplot.smooth_result(res_,3)
         if len(res)==0:
             # print(idd, domain, algo, 'zero data')
             continue
@@ -51,7 +52,9 @@ for idd, domain in enumerate(DOMAINS):
         makerevery = x_vals[-1] // marker_num
 
         _algo_label = algo
-        plt.plot(x_vals, mean, label=_algo_label, marker=marker, markevery=makerevery, color=color, markersize=4,linewidth=1)
+        plt.plot(x_vals, mean, label=_algo_label, marker=marker, color=color, markersize=4,
+                 linewidth=1)
+        # plt.plot(x_vals, mean, label=_algo_label, marker=marker, markevery=makerevery, color=color, markersize=4,linewidth=1)
         plt.fill_between(x_vals, mean - std, mean + std, color=color, alpha=0.3)
         # print(idd, domain, algo, mean[-1], std[-1], len(mean))
 

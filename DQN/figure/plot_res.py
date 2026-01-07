@@ -8,22 +8,15 @@ import numpy as np
 from xingplot.plot import XPlotter
 
 xplot = XPlotter()
-DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0', 'SeaquestNoFrameskip-v4', 'DemonAttackNoFrameskip-v0',]
+DOMAINS = ['BeamRiderNoFrameskip-v0','SpaceInvadersNoFrameskip-v0', 'AsterixNoFrameskip-v0', 'SeaquestNoFrameskip-v0', 'BreakoutNoFrameskip-v4',]
 
-DOMAINS = ['DemonAttackNoFrameskip-v0', ]
+# DOMAINS = ['DemonAttackNoFrameskip-v0', ]
 
 path = '/vepfs-dev/xing/workspace/DNA/experiments'
 algos = [
-    # 'DQN_muon',
-# 'test_eps_1.5e-4_dqn_redo',
-#     'test_eps_1e-4_dqn_redo',
-
-    "test_eps_1e-8_dqn_redo",
-    "test_eps_1e-9_dqn_red0",
-"test_eps_1e-9_tau_0.2_dqn_redo",
-"test_eps_1e-9_tau_0.05_dqn_redo",
-
-# 'redo_test',
+    'DQN_0106',
+    'DQN_redo_0106',
+    "DQN_neuron_editing_0106",
 ]
 metric = "eval_reward"
 
@@ -31,10 +24,6 @@ COLORS = ['#77AC30', '#A56DB0', "#F0C04A",'#FF66B2', '#DE6C3A', '#2988C7', '#000
 # COLORS = ["#ccb974", '#c44e52', '#8172b2', '#55a868', '#4c72b0', '#0000FF']
 MARKERS = ['o', '*', 's', '^', 'x','D']
 
-# metric = "q_value"
-# Plot line chart
-
-# Plot lines
 
 for idd, domain in enumerate(DOMAINS):
     print(idd, domain)
@@ -71,7 +60,7 @@ for idd, domain in enumerate(DOMAINS):
     plt.xlabel('steps(1e6)')
 
     # x_tick_interval = max_len//5  # just want five ticks, let it be max_len//5
-    plt.xticks([0,40,80,120,160,200], ['0', '2', '4', '6', '8','10'])
+    # plt.xticks([0,40,80,120,160,200], ['0', '2', '4', '6', '8','10'])
     # plt.xlim(0, x_ticks[-1]+1)
     # plt.ylim(np.floor(min_y_value), np.ceil(max_y_value))
     plt.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')
@@ -83,10 +72,10 @@ for idd, domain in enumerate(DOMAINS):
         lgd.get_frame().set_alpha(None)
         lgd.get_frame().set_facecolor((0, 0, 0, 0))
     plt.tight_layout()
-    plt.title('('+chr(65+idd)+') '+domain)
+    # plt.title('('+chr(65+idd)+') '+domain)
 
     # plt.show()
     time_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    plt.savefig(f'res/{idd}-{domain}-res-{time_str}.png', bbox_inches='tight',  dpi=300)
-    print('{}-{}-res.png'.format(idd,domain))
+    plt.savefig(f'res/{time_str}_{idd}-{domain}.png', bbox_inches='tight',  dpi=300)
+    # print('{}-{}-res.png'.format(idd,domain))
     plt.clf()

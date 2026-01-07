@@ -56,7 +56,7 @@ def main(cfg: Config) -> None:
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
 
-    exp_path = '/home/sapient/workspace/DNA/experiments'
+    exp_path = '/vepfs-dev/xing/workspace/DNA/experiments'
     res_filename = f'{cfg.env_id}-seed_{cfg.seed}'
 
 
@@ -72,7 +72,7 @@ def main(cfg: Config) -> None:
     if cfg.use_lecun_init:
         # Use the same initialization scheme as jax/flax
         q_network.apply(lecun_normal_initializer)
-    from optimizer import get_optimizer
+    from DQN.optimizer import get_optimizer
     optimizer = get_optimizer(cfg,q_network)
 
 
@@ -138,6 +138,7 @@ def main(cfg: Config) -> None:
                         dones=data.dones,
                         gamma=cfg.gamma,
                     )
+                    optimizer.zero_grad()
                     loss.backward()
                     optimizer.first_step(zero_grad=True)
 
@@ -191,7 +192,7 @@ def main(cfg: Config) -> None:
                     )
 
             if global_step %cfg.evaluateion_freq==0:
-
+                eval_freq = cfg.evaluateion_freq
                 eval_state = q_network.state_dict()
                 # evaluate(
                 #     envs=eval_envs,
@@ -202,7 +203,7 @@ def main(cfg: Config) -> None:
                 # )
                 while eval_thread and eval_thread.is_alive():
                     time.sleep(1)
-                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, eval_q_network, xlog, device))
+                eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, eval_q_network, xlog, device, eval_freq))
                 eval_thread.start()
                 # eval_thread.join()
 

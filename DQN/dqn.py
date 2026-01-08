@@ -194,13 +194,6 @@ def main(cfg: Config) -> None:
             if global_step %cfg.evaluateion_freq==0:
                 eval_freq = cfg.evaluateion_freq
                 eval_state = q_network.state_dict()
-                # evaluate(
-                #     envs=eval_envs,
-                #     eval_episodes=5,
-                #     state_dict=eval_state,
-                #     device=device,
-                #     xlog=xlog,
-                # )
                 while eval_thread and eval_thread.is_alive():
                     time.sleep(1)
                 eval_thread = threading.Thread(target=evaluate, args=(global_step,eval_envs, 4, eval_state, eval_q_network, xlog, device, eval_freq))

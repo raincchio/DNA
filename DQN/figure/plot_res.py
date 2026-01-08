@@ -34,7 +34,7 @@ for idd, domain in enumerate(DOMAINS):
     for algo in algos:
         algo_path = os.path.join(path, algo)  # can  get multiple metrics result
         res_ = xplot.get_result(algo_path, domain=domain, metric=metric)
-        res = xplot.smooth_result(res_,3)
+        res = xplot.smooth_result(res_,10)
         if len(res)==0:
             # print(idd, domain, algo, 'zero data')
             continue
@@ -52,9 +52,9 @@ for idd, domain in enumerate(DOMAINS):
         makerevery = x_vals[-1] // marker_num
 
         _algo_label = algo
-        plt.plot(x_vals, mean, label=_algo_label, marker=marker, color=color, markersize=4,
-                 linewidth=1)
-        # plt.plot(x_vals, mean, label=_algo_label, marker=marker, markevery=makerevery, color=color, markersize=4,linewidth=1)
+        # plt.plot(x_vals, mean, label=_algo_label, marker=marker, color=color, markersize=4,
+        #          linewidth=1)
+        plt.plot(x_vals, mean, label=_algo_label, marker=marker, markevery=makerevery, color=color, markersize=4,linewidth=1)
         plt.fill_between(x_vals, mean - std, mean + std, color=color, alpha=0.3)
         # print(idd, domain, algo, mean[-1], std[-1], len(mean))
 
@@ -63,7 +63,7 @@ for idd, domain in enumerate(DOMAINS):
     plt.xlabel('steps(1e6)')
 
     # x_tick_interval = max_len//5  # just want five ticks, let it be max_len//5
-    # plt.xticks([0,40,80,120,160,200], ['0', '2', '4', '6', '8','10'])
+    plt.xticks([0,40,80,120,160,200], ['0', '2', '4', '6', '8','10'])
     # plt.xlim(0, x_ticks[-1]+1)
     # plt.ylim(np.floor(min_y_value), np.ceil(max_y_value))
     plt.ticklabel_format(style='sci', scilimits=(0, 0), axis='y')

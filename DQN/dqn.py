@@ -34,6 +34,7 @@ def main(cfg: Config) -> None:
     random.seed(cfg.seed)
     np.random.seed(cfg.seed)
 
+
     # torch
     torch.manual_seed(cfg.seed)
     torch.cuda.manual_seed(cfg.seed)
@@ -56,11 +57,11 @@ def main(cfg: Config) -> None:
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
 
-    exp_path = '/vepfs-dev/xing/workspace/DNA/experiments'
+    exp_path = '/home/sapient/workspace/DNA/experiments'
     res_filename = f'{cfg.env_id}-seed_{cfg.seed}'
 
 
-    rec_variable_name = ['eval_reward','expl_reward','td_loss','q_values',f"dormant_tau_{cfg.redo_tau}_fraction",f"dormant_tau_{cfg.redo_tau}_count"]
+    rec_variable_name = ['eval_reward','expl_reward','td_loss','q_values',f"neuron_info_{cfg.redo_tau}"]
     xlog = XLogger(exp_path=exp_path, algo_dir=cfg.exp_name, res_filename=res_filename, record_variable_names=rec_variable_name)
     single_action_space = int(envs.single_action_space.n)
     q_network = QNetwork(single_action_space, bias=not cfg.wob).to(device)
@@ -174,15 +175,14 @@ def main(cfg: Config) -> None:
 
             if global_step % cfg.redo_check_interval == 0:
                 redo_samples = rb.sample(cfg.redo_bs)
-                redo_out = run_redo(
+                neuron_info = run_redo(
                     redo_samples.observations,
                     model=q_network,
                     optimizer=optimizer,
                     cfg=cfg,
                 )
 
-                xlog.update(f"dormant_tau_{cfg.redo_tau}_fraction", redo_out["dormant_fraction"].item())
-                xlog.update(f"dormant_tau_{cfg.redo_tau}_count", redo_out["dormant_count"].item())
+                xlog.update(f"neuron_info_{cfg.redo_tau}", neuron_info)
 
             # update target network
             if global_step % cfg.target_network_frequency == 0:

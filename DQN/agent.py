@@ -19,7 +19,10 @@ class QNetwork(nn.Module):
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
         x = torch.flatten(x, start_dim=1)
-        x = F.relu(self.fc1(x))
+        x = self.fc1(x)
+        # x = F.relu(self.fc1(x))
+        x= F.relu(x)
+        # x = (x * torch.sigmoid(x)) * F.gelu(x)
         x = self.q(x)
         return x
 
